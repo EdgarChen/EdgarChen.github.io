@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>HTML Paser - bufToHash</title>
+</head>
+
+<body>
+<input>
+<button>Enter</button>
+<div></div>
+</body>
+<script>
+function bufToHash(aBuf) {
+  let len = aBuf.length;
+  let first = aBuf.charCodeAt(0) << 19;
+  let second = 1 << 23;
+  let third = 0;
+  let fourth = 0;
+  let fifth = 0;
+  let sixth = 0;
+
+  if (len >= 4) {
+    second = aBuf.charCodeAt(len - 4) << 4;
+    third = aBuf.charCodeAt(1) << 9;
+    fourth = aBuf.charCodeAt(len - 2) << 14;
+    fifth = aBuf.charCodeAt(3) << 24;
+    sixth = aBuf.charCodeAt(len - 1) << 11;
+  } else if (len == 3) {
+    second = aBuf.charCodeAt(1) << 4;
+    third = aBuf.charCodeAt(2) << 9;
+  } else if (len == 2) {
+    second = aBuf.charCodeAt(1) << 24;
+  }
+
+  return len + first + second + third + fourth + fifth + sixth;
+}
+
+document.querySelector("button").onclick = function() {
+  let input = document.querySelector("input");
+  let result = document.querySelector("div");
+
+  result.innerText = bufToHash(input.value);
+};
+</script>
+</html>

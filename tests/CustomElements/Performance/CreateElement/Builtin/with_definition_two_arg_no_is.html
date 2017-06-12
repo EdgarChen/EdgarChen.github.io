@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Custom Element Performance</title>
+</head>
+<body>
+</body>
+<div>CreateElement - With Definition, two arg, no "is":</div>
+<div id="log"></div>
+<script>
+
+class FooElement extends HTMLDivElement {
+  constructor() {
+    super();
+  }
+};
+customElements.define("x-foo", FooElement, { extends: "div" });
+
+(function() {
+  var count = 100000;
+  var start = performance.now();
+  for (var i = 0; i < count; ++i) {
+    document.createElement("div", {});
+  }
+  var end = performance.now();
+  document.getElementById("log").innerText = ((end - start)/count * 1e6);
+})()
+</script>
+</html>

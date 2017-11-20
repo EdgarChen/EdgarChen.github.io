@@ -1,0 +1,17 @@
+<html>
+<head>
+<title>div.cloneNode(true)</title>
+<script src="test.js"></script>
+<script>
+  onload = () => {
+    var test = document.getElementById("test");
+    Start(100000, 50, () => {
+      test.cloneNode(true);
+    });
+  }
+</script>
+</head>
+<body>
+<div id="test"></div>
+</body>
+</html>

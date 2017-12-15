@@ -1,0 +1,19 @@
+<html>
+<head>
+<title>element.getAttribute(property)</title>
+<script src="test.js"></script>
+<script>
+  onload = () => {
+    var test = document.getElementById("test");
+    var s = 0;
+    Start(100000, 50, () => {
+      //test.getAttribute("id");
+      test["test" + (s++)];
+    });
+  }
+</script>
+</head>
+<body>
+<div id="test"></div>
+</body>
+</html>

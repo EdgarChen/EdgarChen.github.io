@@ -23,7 +23,7 @@ function Start(aNumber, aIterations, aTestFun) {
     result.appendChild(new Text(n + ". " + e + " ms"));
     result.appendChild(document.createElement("br"));
 
-    if (n < aIterations) {
+    if ((aIterations < 0) || (n < aIterations)) {
       setTimeout(iteration, 50);
     }
   })();

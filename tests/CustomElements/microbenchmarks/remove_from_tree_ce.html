@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>customElement.remove()</title>
+<script src="test.js"></script>
+</head>
+<body>
+<div id="test"></div>
+<script>
+onload = () => {
+  // setup
+  var test = document.getElementById("test");
+  var num = 1000;
+  var instance;
+  for (let i = 0; i < num; i++) {
+    instance = document.createElement("x-foo")
+    test.appendChild(instance);
+  }
+  instance.remove();
+  test.appendChild(instance);
+
+  // start
+  var s = 0;
+  Start(50000, 50, () => {
+    instance.remove();
+    test.appendChild(instance);
+  });
+}
+</script>
+</body>
+</html>

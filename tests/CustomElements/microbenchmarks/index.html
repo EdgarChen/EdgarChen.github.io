@@ -1,11 +1,18 @@
 <html>
 <head>
 <title>Microbenchmarks for Custom Elements</title>
+<style>
+div.title {
+  font-weight: bold;
+}
+</style>
 </head>
 
 <body>
 <h1>Microbenchmarks for Custom Elements</h1>
 <hr></hr>
+
+<div class="title">No CE:</div>
 <ol>
   <li><a href="reactions_no_ce.html">element.property = value</a></li>
   <li><a href="reactions_no_ce.html">element.getAttribute(property)</a></li>
@@ -13,9 +20,18 @@
   <li><a href="innerHTML_no_ce.html">element.innerHTML = "&lt;div&gt;&lt;&#x2F;div&gt;"</a></li>
   <li><a href="cloneNode_no_ce.html">div.cloneNode(true)</a></li>
 </ol>
+
+<br>
+<div class="title">CE (without upgrading):</div>
 <ol>
   <li><a href="createElement_no_definition.html">document.createElement("x-foo")</a></li>
   <li><a href="remove_from_tree_ce.html">customElement.remove()</a></li>
+</ol>
+
+<br>
+<div class="title">CE (with upgrading):</div>
+<ol>
+  <li></li>
 </ol>
 </body>
 </html>

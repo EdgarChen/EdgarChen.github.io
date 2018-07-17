@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<title>without :active::after</title>
+<style>
+a {
+  background: green;
+  height: 64px;
+  width: 32px;
+  display: block;
+}
+span::before {
+  content: "";
+  background: red;
+  height: 32px;
+  width: 32px;
+  display: block;
+}
+</style>
+<a href="javascript:alert('clicked')">
+  <span></span>
+</a>
+<br><br>
+</html>

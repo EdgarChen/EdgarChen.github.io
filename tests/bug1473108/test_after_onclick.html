@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<title>with :active::after + onclick</title>
+<style>
+a {
+  background: green;
+  height: 64px;
+  width: 32px;
+  display: block;
+}
+span::before {
+  content: "";
+  background: red;
+  height: 32px;
+  width: 32px;
+  display: block;
+}
+span:active::after {
+  content: "";
+}
+</style>
+<a href="javascript:alert('clicked')">
+  <span onclick="javascript:alert('span clicked')"></span>
+</a>
+<br><br>
+</html>

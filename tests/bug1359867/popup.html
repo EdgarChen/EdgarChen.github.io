@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<p>Tests for User Activation - Popup</p>
+<p id='accesskey' accesskey='p'>1. accesskey (p): </p>
+<p id='click'>2. click (click me): </p>
+<p id='mouseup'>3. mouseup (click me): </p>
+<p id='mousedown'>4. mousedown (click me): </p>
+<p id='dblclick'>5. dblclick (double click me): </p>
+<p id='contextmenu'>6. contextmenu (touch and hold): </p>
+<p id='submitLog'>7. submit (click submit button below): </p>
+<p id='resetLog'>8. reset (click reset button below): </p>
+<p id='keypressEnter'>9. keypress (Enter): </p>
+<p id='keypressa'>10. keypress (a): </p>
+<p id='keypress '>11. keypress (Space): </p>
+<p id='changeLog'>11. change (change the input value): </p>
+<form id='form'>
+<input id='submit' type='submit'>
+<input id='reset' type='reset'>
+<input id='change' type='text'>
+</form>
+<script>
+window.onload = () => {
+  function pause(millis) {
+    var date = new Date();
+    var curDate = null;
+    do {
+      curDate = new Date();
+    } while(curDate - date < millis);
+  }
+
+  function listener(e, log) {
+    let target = e.target;
+    log = log || target;
+    pause(10000);
+    let popup = window.open("", "", "width=200,height=100");
+    if (popup) {
+      popup.close();
+      log.innerHTML += "<span style='color: blue;'>opened</span>";
+    } else {
+      log.innerHTML += "<span style='color: red;'>blocked</span>";
+    }
+    target.removeEventListener(e.type, listener);
+    e.preventDefault();
+  }
+
+  document.getElementById('accesskey').addEventListener('click', listener);
+  for (let name of ['click', 'mousedown', 'mouseup', 'dblclick', 'contextmenu']) {
+    document.getElementById(name).addEventListener(name, listener);
+  }
+
+  for (let name of ['submit', 'reset', 'change']) {
+    document.getElementById('form').addEventListener(name, function lsn(e) {
+      listener(e, document.getElementById(name + "Log"));
+      e.target.removeEventListener(e.type, lsn);
+      document.getElementById(name).disabled = true;
+    });
+  }
+
+  let keypress = ['Enter', 'a', ' '];
+  window.addEventListener('keypress', function keypressListener(e) {
+    console.log(e.keyCode);
+    let index = keypress.indexOf(e.key);
+    if (index != -1) {
+      listener(e, document.getElementById('keypress' + e.key));
+      keypress.splice(index, 1);
+      if (keypress.length == 0) {
+        window.removeEventListener('keypress', keypressListener);
+      }
+    }
+  });
+};
+</script>

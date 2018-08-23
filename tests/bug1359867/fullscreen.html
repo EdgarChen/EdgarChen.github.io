@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<p>Tests for User Activation - Fullscreen</p>
+delay: <input id='delay' type='number'></input> ms
+<p id='accesskey' accesskey='p'>1. accesskey (p): </p>
+<p id='click'>2. click (click me): </p>
+<p id='mouseup'>3. mouseup (click me): </p>
+<p id='mousedown'>4. mousedown (click me): </p>
+<p id='dblclick'>5. dblclick (double click me): </p>
+<p id='contextmenu'>6. contextmenu (touch and hold): </p>
+<p id='touchstart'>7. touchstart (touch screen): </p>
+<p id='touchend'>8. touchend (release touch): </p>
+<p id='submitLog'>9. submit (click submit button below): </p>
+<p id='resetLog'>10. reset (click reset button below): </p>
+<p id='keypressEnter'>11. keypress (Enter): </p>
+<p id='keypressEsc'>12. keypress (Esc): </p>
+<p id='keypressa'>13. keypress (a): </p>
+<p id='keypress '>14. keypress (Space): </p>
+<p id='changeLog'>15. change (change the input value): </p>
+<p id='keyupEscape'>16. keyup (Esc): </p>
+<form id='form'>
+<input id='submit' type='submit'>
+<input id='reset' type='reset'>
+<input id='change' type='text'>
+</form>
+<script>
+window.onload = () => {
+  function pause(millis) {
+    var date = new Date();
+    var curDate = null;
+    do {
+      curDate = new Date();
+    } while(curDate - date < millis);
+  }
+
+  function listener(e, log) {
+    let target = e.target;
+    log = log || target;
+    document.onfullscreenerror = function listener(e) {
+      log.innerHTML += "<span style='color: red;'>error</span>";
+      document.onfullscreenerror = null;
+      document.onfullscreenchange = null; 
+    };
+    document.onfullscreenchange = function listener(e) {
+      log.innerHTML += "<span style='color: blue;'>success</span>";
+      document.exitFullscreen();
+      document.onfullscreenerror = null;
+      document.onfullscreenchange = null; 
+    };
+    let delay = parseInt(document.getElementById('delay').value, 10);
+    if (delay > 0) {
+      pause(delay);
+    }
+    document.documentElement.requestFullscreen();
+    target.removeEventListener(e.type, listener);
+    e.preventDefault();
+  }
+
+  document.getElementById('accesskey').addEventListener('click', listener);
+  for (let name of ['click', 'mousedown', 'mouseup', 'dblclick', 'contextmenu', 'touchstart', 'touchend']) {
+    document.getElementById(name).addEventListener(name, listener);
+  }
+
+  for (let name of ['submit', 'reset', 'change']) {
+    document.getElementById('form').addEventListener(name, function lsn(e) {
+      listener(e, document.getElementById(name + "Log"));
+      e.target.removeEventListener(e.type, lsn);
+      document.getElementById(name).disabled = true;
+    });
+  }
+
+  let keypress = ['Enter', 'Escape', 'a', ' '];
+  window.addEventListener('keypress', function keypressListener(e) {
+    console.log('keypress: ' + e.keyCode);
+    let index = keypress.indexOf(e.key);
+    if (index != -1) {
+      listener(e, document.getElementById('keypress' + e.key));
+      keypress.splice(index, 1);
+      if (keypress.length == 0) {
+        window.removeEventListener('keypress', keypressListener);
+      }
+    }
+  });
+
+  let keyup = ['Escape'];
+  window.addEventListener('keyup', function keyup(e) {
+    console.log('keyup: ' + e.key);
+    let index = keypress.indexOf(e.key);
+    if (index != -1) {
+      listener(e, document.getElementById('keyup' + e.key));
+      keypress.splice(index, 1);
+      if (keypress.length == 0) {
+        window.removeEventListener('keyup', keyup);
+      }
+    }
+  });
+};
+</script>

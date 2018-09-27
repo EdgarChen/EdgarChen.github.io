@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<div id="target" style="background-color: red; width: 200px; height: 200px">
+</div>
+<div id="tip" style="background-color: green; width: 100px; height: 50px; position: absolute; overflow: hidden; left: 208px; top: 623px; display: none;">
+</div>
+<script>
+var width = 100;
+var height = 50;
+var time;
+var target = document.getElementById("target");
+var tip = document.getElementById("tip");
+var isUntouched = false;
+
+var log = function(msg) {
+  console.log(msg);
+};
+
+var hide = function(e) {
+  tip.style.display = "none";
+  isUntouched = false;
+};
+
+var show = function(e) {
+  let os = target.getBoundingClientRect();
+  let sW = 200;
+  let sH = 200;
+
+  if (!isUntouched) {
+    isUntouched = true;
+    return;
+  }
+
+  if (e.pageX > sW + os.left + 10 || e.pageX < os.left + 10 ||
+      e.pageY > sH + os.top + 10 || e.pageY < os.top - 10) {
+    hide(e);
+    return;
+  }
+
+  time = time ? clearTimeout(time) : 0;
+  tip.style.display = "block";
+  tip.style.left = (e.pageX - 50) + "px";
+  tip.style.top =  (e.pageY - 25) + "px";
+};
+
+target.addEventListener("mouseout", function(e) {
+  log("target mouseout");
+  time = setTimeout( () => {
+    log("timer fired");
+    hide();
+  }, 10);
+});
+target.addEventListener("mousemove", function(e) {
+  log(`target mousemove`);
+  show(e);
+});
+tip.addEventListener("mouseout", function(e) {
+  log("tip mouseout");
+  hide(e);
+});
+tip.addEventListener("mousemove", function(e) {
+  log(`tip mousemove (${e.pageX}, ${e.pageY})`);
+  show(e);
+});
+</script>
+</html>

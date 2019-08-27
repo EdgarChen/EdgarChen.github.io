@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<style>
+div {
+  height: 100px;
+  width: 100px;
+  background-color: red;
+};
+iframe {
+  height: 50%;
+};
+</style>
+<audio id="clip" src="noise.mp3"></audio>
+<input type="text">
+<div id="div"></div>
+<pre id="result"></pre>
+<form id="form"><input type="submit"></form>
+<iframe height="500" src="https://software.hixie.ch/utilities/js/live-dom-viewer/?saved=7156"></iframe>
+<iframe height="500" src="https://software.hixie.ch/utilities/js/live-dom-viewer/?saved=7156"></iframe>
+<iframe height="500" src="https://edgarchen.github.io/tests/UserActivation/user_activation_iframe.html"></iframe>
+<iframe height="500" src="https://edgarchen.github.io/tests/UserActivation/user_activation_iframe.html"></iframe>
+<iframe height="500" src="user_activation_iframe.html"></iframe>
+<!--<iframe height="500" srcdoc="<div style='height:100px; width:100px; background-color: red;'></div><iframe height='100' srcdoc='<div></div>'></iframe>"></iframe>-->
+<script>
+function w(msg) {
+  result.textContent += msg + '\n';
+}
+
+function openWindow() {
+  window.open();
+}
+
+function playAudio() {
+  let clip = document.getElementById('clip');
+  clip.play().then(() => {
+    w("play success");
+  }, (reason) => {
+    w(`play fail: ${reason}`);
+  });
+}
+
+function openWindowRepeat() {
+  let win = window.open();
+  if (win) {
+    w("open success");
+  } else {
+    w(`open fail`);
+    setTimeout(openWindowRepeat, 1000);
+  }
+}
+
+function requestFullscreen() {
+  if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+      w("webkitRequestFullscreen");
+  } else {
+    let request = document.documentElement.requestFullscreen();
+    request.then(() => {
+      w("requestFullscreen success");
+    }, (reason) => {
+      w(`requestFullscreen fail: ${reason}`);
+    });
+  }
+}
+
+function playAudioRepeat() {
+  let clip = document.getElementById('clip');
+  clip.play().then(() => {
+    w("play success");
+  }, (reason) => {
+    w(`play fail: ${reason}`);
+    setTimeout(playAudioRepeat, 1000);
+  });
+}
+
+let iframe1, iframe2, iframe3;
+onload = function() {
+  w("onload");
+  //openWindowRepeat();
+  playAudioRepeat();
+  iframe1 = document.getElementById("iframe1");
+  iframe2 = document.getElementById("iframe2");
+  iframe3 = document.getElementById("iframe3");
+
+  w(iframe3);
+  w(iframe3.contentWindow);
+  iframe3.contentDocument.addEventListener("click", function() {
+    w("iframe3 onclick");
+    iframe2.focus();
+    //onSetTimeout(10);
+    //onAnimationFrame();
+  });
+  //onSetTimeout(0);
+  //openWindowRepeat();
+};
+
+(function() {
+  let listener = function(event) {
+    // Promise resolve in setTimeout.
+    /*
+    let resolve;
+    let promise = new Promise(function(aResolve) {
+      resolve = aResolve;
+    });
+    setTimeout(function() {
+      resolve();
+      w("timeout");
+    }, 10);
+    resolve();
+    */
+
+    // Call directly in event handler.
+    //window.open();
+    //w("window.open");
+
+    // For debug
+    /*
+    setTimeout(function() {
+      setTimeout(function() {
+        resolve();
+      }, 1);
+    }, 1);
+    */
+
+    //requestFullscreen();
+    //onIdleRequest();
+    //onSetTimeout(0);
+    //onAnimationFrame();
+    w(`${event.type}: ${event.key}`);
+    /*
+    switch (event.key) {
+      case "Escape":
+      case "Control":
+        requestFullscreen();
+        break;
+      default:
+        requestFullscreen();
+        return;
+    }*/
+    //playAudio();
+    //requestFullscreen();
+    //openWindow();
+    //openWindow();
+  };
+
+  let print = function(event) {
+    w(`${event.type}`);
+  };
+
+  document.addEventListener("mouseup", print);
+  document.addEventListener("drop", print);
+  document.addEventListener("click", listener);
+  //div.addEventListener("mousedown", listener);
+  //document.addEventListener("keypress", listener);
+  document.addEventListener("keyup", listener);
+  //document.addEventListener("keydown", listener);
+
+  // Test notification
+  /*
+  var n = new Notification('some title');
+  n.onclick = function () {
+    window.focus();
+  };
+  */
+
+  // test form submission
+  form.addEventListener("submit", function(e) {
+    requestFullscreen();
+    w("onsubmit");
+    e.preventDefault();
+  });
+})();
+</script>

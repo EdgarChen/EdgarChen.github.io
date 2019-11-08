@@ -1,0 +1,13 @@
+<title>Test Use Counters for Worker</title>
+<script>
+  try {
+    let worker = new Worker("worker.js");
+    worker.onmessage = function(e) {
+      console.log("window message");
+    };
+    worker.postMessage("Message");  
+
+} catch(e) {
+    console.log(e);
+  }
+</script>

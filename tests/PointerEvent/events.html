@@ -1,0 +1,80 @@
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=0.5, user-scalable=no">
+<button id="logging">Logging</button><button id="touch">Touch</button>
+<div style = "height: 90%;" id="target">
+    <div id="log"></div>
+</div>
+<script>
+    let logging = true;
+    document.getElementById("logging").onclick = function(e) {
+        logging = !logging;
+    };
+
+    var div = document.getElementById("log");
+    div.innerHTML = "";
+    let log = function(msg, color) {
+        let font = document.createElement("font");
+        if (color) {
+            font.color = color;
+        }
+
+        font.innerHTML = `${msg}<br>`;
+        div.appendChild(font);
+    };
+
+    var target = document.getElementById("target");
+
+    /* Pointer Logger */
+    let tracking = [];
+    ["pointerdown", "pointermove", "pointerup", "pointercancel"].forEach(function(type) {
+      target.addEventListener(type, (e) => {
+        e.preventDefault();
+        if (!logging) {
+            return;
+        }
+
+        let color;
+        if (e.type === "pointerdown") {
+          tracking[e.pointerId] = true;
+          color = "red";
+        } else if (e.type === "pointerup" || e.type === "pointercancel") {
+          tracking[e.pointerId] = false;
+          color = "blue"
+        } else if (e.type === "pointermove") {
+          if (!tracking[e.pointerId]) {
+            return;
+          }
+        }
+
+        log(`${e.type}, pointerId: ${e.pointerId}, pointerType: ${e.pointerType}, pageX: ${e.pageX}, pageY: ${e.pageY}`, color);
+        e.preventDefault();
+      });
+    });
+
+    /* Touch Logger */
+    let touchLogging = false;
+    document.getElementById("touch").onclick = function(e) {
+        touchLogging = !touchLogging;
+    };
+
+    let touchLogger = function(touches) {
+        let length = touches.length;
+        for (let i = 0; i < length; i++) {
+            let touch = touches.item(i);
+            log(`&nbsp;&nbsp;&nbsp;&nbsp;id: ${touch.identifier}, pageX: ${touch.pageX}, pageY: ${touch.pageY}`);
+        }
+    };
+
+    ["touchstart", "touchmove", "touchend", "touchcancel"].forEach(function(type) {
+      target.addEventListener(type, (e) => {
+        e.preventDefault();
+        if (!logging || !touchLogging) {
+          return;
+        }
+
+        log(`${e.type}`);
+        touchLogger(e.touches);
+      });
+    });
+</script>
+</html>

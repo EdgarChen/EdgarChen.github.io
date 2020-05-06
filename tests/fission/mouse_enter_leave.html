@@ -1,0 +1,21 @@
+<html>
+<body>
+<style>
+#log {
+  width: 100%;
+  height: 100%;
+  background-color: lightgreen;
+}
+</style>
+<div id="log">Log:<br></div>
+<script>
+let logger = document.querySelector("div");
+function log(e) {
+  logger.innerHTML += `${e.type}<br>`;
+}
+window.onload = log;
+logger.onmouseenter = log;
+logger.onmouseleave = log;
+</script>  
+</body>
+</html>

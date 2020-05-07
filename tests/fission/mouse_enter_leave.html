@@ -17,9 +17,9 @@ function log(e) {
 window.onload = log;
 logger.onmouseenter = log;
 logger.onmouseleave = log;
-document.querySelector("button", function() {
+document.querySelector("button").onclick = function() {
   logger.innerHTML = "";
-});
+};
 </script>  
 </body>
 </html>

@@ -7,19 +7,21 @@
   background-color: lightgreen;
 }
 </style>
-<button>Clear</button>
-<div id="log"></div>
+<div id="log">
+<strong>Event Log</strong>
+</div>
 <script>
 let logger = document.querySelector("div");
-function log(e) {
-  logger.innerHTML += `${e.type}<br>`;
-}
-window.onload = log;
+let log = function(e) {
+  // Log to the console.
+  console.log(e.type, e);
+
+  let li = document.createElement("li");
+  li.textContent = `${e.type}`;
+  logger.appendChild(li);
+};
 logger.onmouseenter = log;
 logger.onmouseleave = log;
-document.querySelector("button").onclick = function() {
-  logger.innerHTML = "";
-};
 </script>  
 </body>
 </html>

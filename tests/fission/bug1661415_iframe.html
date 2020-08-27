@@ -33,11 +33,16 @@ let handleClick = function(e) {
   e.preventDefault();
 };
 
+let handleBlur = function(e) {
+  log(`onblur: target: ${e.target}`);
+};
+
 ["a", "b", "c", "d"].forEach(id => {
   let ele = document.getElementById(id);
   ele.setAttribute("accesskey", id);
   ele.addEventListener("click", handleClick);
   ele.addEventListener("focus", handleFocus);
+  ele.addEventListener("blur", handleBlur);
 });
 
 </script>

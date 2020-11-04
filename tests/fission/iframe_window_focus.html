@@ -1,0 +1,30 @@
+<html>
+<head>
+<style>
+</style>
+</head>
+<body>
+<button>window.focus()</button><br>
+<div id="logger"><div>
+<script>
+let logger = document.getElementById("logger");
+function log(msg) {
+  logger.innerHTML += `${msg}<br>`;
+}
+
+let btn = document.querySelector("button");
+btn.addEventListener("click", function(e) {
+  window.focus();
+});
+
+let handler = function(e) {
+  log(`on${e.type}: ${e.target}`);
+  log(`document.activeElement: ${document.activeElement}`);
+};
+
+window.addEventListener("focus", handler);
+window.addEventListener("blur", handler);
+window.focus();
+</script>
+</body>
+</html>

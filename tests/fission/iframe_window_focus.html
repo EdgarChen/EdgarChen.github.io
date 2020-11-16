@@ -14,12 +14,11 @@ function log(msg) {
 
 let btn = document.querySelector("button");
 btn.addEventListener("click", function(e) {
+  log("onclick");
+  log("before calling window.focus()");
   window.focus();
+  log("after calling window.focus()");
 });
-
-let handler = function(e) {
-  log(`on${e.type}: ${e.target}`);
-};
 
 window.onload = function(e) {
   log("window.onload");
@@ -27,6 +26,10 @@ window.onload = function(e) {
   window.focus();
   log("after calling window.focus()");
 }
+
+let handler = function(e) {
+  log(`on${e.type}: ${e.target}`);
+};
 
 window.addEventListener("focus", handler);
 window.addEventListener("blur", handler);

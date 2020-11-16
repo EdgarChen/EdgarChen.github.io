@@ -19,12 +19,17 @@ btn.addEventListener("click", function(e) {
 
 let handler = function(e) {
   log(`on${e.type}: ${e.target}`);
-  log(`document.activeElement: ${document.activeElement}`);
 };
+
+window.onload = function(e) {
+  log("window.onload");
+  log("before calling window.focus()");
+  window.focus();
+  log("after calling window.focus()");
+}
 
 window.addEventListener("focus", handler);
 window.addEventListener("blur", handler);
-window.focus();
 </script>
 </body>
 </html>

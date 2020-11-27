@@ -1,0 +1,21 @@
+<html>
+<head>
+<style>
+</style>
+</head>
+<body>
+<div id="logger"><div>
+<script>
+let logger = document.getElementById("logger");
+function log(msg) {
+  logger.innerHTML += `${msg}<br>`;
+}
+
+let handler = function(e) {
+  log(`on${e.type}: ${e.key}`);
+};
+
+window.addEventListener("keydown", handler);
+</script>
+</body>
+</html>

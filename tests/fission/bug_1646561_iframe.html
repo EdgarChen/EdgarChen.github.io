@@ -1,0 +1,11 @@
+<input></input>
+<script>
+window.onmessage = function(e) { 
+  console.log(e.data);
+  if (e.data === 'focus') {
+    document.querySelector('input').focus();
+  } else if (e.data === 'activeElement') {
+    parent.postMessage(document.activeElement.tagName, '*');
+  }
+};
+</script>

@@ -1,0 +1,11 @@
+<iframe id="subIframe" allowfullscreen src="file:///Users/edgar/Workspace/debug/bug1718796/bug1718796_iframe.html"></iframe><br>
+<button>request fullscreen</button>
+<script>
+    window.addEventListener('load', function () {
+        let iframe = document.getElementById("subIframe");
+        iframe.style.display = "none";
+        document.querySelector("button").addEventListener("click", function() {
+            iframe.contentWindow.postMessage("request", "*");
+        });
+    });
+</script>

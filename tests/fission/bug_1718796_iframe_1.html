@@ -1,0 +1,12 @@
+<script>
+addEventListener('message', function(e) {
+  if (e.data === 'request') {
+    let fullscreenRequestMethod =
+      document.documentElement.requestFullscreen ||
+      document.documentElement.webkitRequestFullscreen ||
+      document.documentElement.webkitRequestFullScreen;
+    fullscreenRequestMethod.apply(document.documentElement);
+  }
+});
+</script>
+<body></body>

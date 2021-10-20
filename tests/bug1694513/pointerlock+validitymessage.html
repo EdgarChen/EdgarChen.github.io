@@ -106,12 +106,12 @@ function setupCustomValidity() {
 </head>
 
 <body contenteditable="true" onload="setupCustomValidity(); setupCanvas()">
+  <select id="divSelect" style="opacity: 0; margin-top: -100px; margin-left: 310px;" size="1">
+  </select>
   <!-- pointerlock (without escape key) code  -->
   <div id="divPointer" style="margin-left: 20px; margin-top: 20px;" onmousedown="showValidityIf();" onfocus="start()">
     -> Double-click here to start pointerlock (without escape key)
   </div>
-  <select id="divSelect" style="opacity: 0; margin-top: 99px; margin-left: 310px;" size="55">
-  </select>
 
   <canvas id="customValidityCanvas">
   </canvas>

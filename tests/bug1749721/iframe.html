@@ -1,0 +1,10 @@
+<body>
+<font color="blue">!!!! SHOULD NOT SEE MOUSEMOVE EVENT LOGGED HERE !!!</font><br>
+<div></div>
+<script>
+let div = document.querySelector("div");
+document.addEventListener("mousemove", function(e) {
+  div.innerHTML += `<font color="red">${e.type}</font><br>`;
+});
+</script>
+</body>

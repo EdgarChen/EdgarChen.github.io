@@ -1,0 +1,11 @@
+<html>
+<script>
+window.addEventListener("focus", function(e) {
+  console.log("iframe focus");
+  parent.postMessage("focused", "*");
+});
+window.addEventListener("blur", function(e) {
+  console.log("iframe blur");
+});
+</script>
+</html>

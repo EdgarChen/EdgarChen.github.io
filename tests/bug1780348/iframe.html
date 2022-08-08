@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<style>
+div {
+  height: 100px;
+  width: 100px;
+  background-color: green;
+};
+</style>
+<div id="div"></div>
+<script>
+let div = document.getElementById("div");
+div.addEventListener("click", (e) => {
+  top.postMessage("navigate", "*");
+  setTimeout(() => {
+    div.requestFullscreen();
+  }, 100);
+});
+</script>

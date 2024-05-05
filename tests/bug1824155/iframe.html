@@ -1,0 +1,17 @@
+<body>
+<div></div>
+</body>
+<script>
+function log(aMsg) {
+  document.querySelector("div").innerText += `${aMsg}\n`;
+}
+
+["focus", "blur"].forEach(type => {
+  document.addEventListener(type, (e) => {
+  	log(`document ${type}`);
+  });
+  document.body.addEventListener(type, (e) => {
+  	log(`body ${type}`);
+  });
+});
+</script>

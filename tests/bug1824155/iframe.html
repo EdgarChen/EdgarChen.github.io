@@ -1,4 +1,5 @@
 <body>
+<input><br>
 <div></div>
 </body>
 <script>
@@ -8,10 +9,13 @@ function log(aMsg) {
 
 ["focus", "blur"].forEach(type => {
   document.addEventListener(type, (e) => {
-  	log(`document ${type}`);
+    log(`document ${type}`);
   });
   document.body.addEventListener(type, (e) => {
-  	log(`body ${type}`);
+    log(`body ${type}`);
+  });
+  document.querySelector("input").addEventListener(type, (e) => {
+    log(`input ${type}`);
   });
 });
 </script>

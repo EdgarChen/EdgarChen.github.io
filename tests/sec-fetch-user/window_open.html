@@ -1,0 +1,14 @@
+<html>
+<body>
+<button id="opener">window.open()</button>
+<button id="noopener">window.open() with noopener</button>
+<script>
+document.getElementById("opener").addEventListener("click", (e) => {
+  window.open("new_window.html");
+});
+document.getElementById("noopener").addEventListener("click", (e) => {
+  window.open("new_window.html", "_blank", "noopener");
+});
+</script>
+</body>
+</html>

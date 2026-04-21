@@ -17,17 +17,26 @@
 Iframe loads https://httpbin.org/delay/5 which delay response for 5 sec.<br>
 <iframe src="https://httpbin.org/delay/5"></iframe><br>
 <button onclick='window.container.requestFullscreen({keyboardLock: "none"})'>Fullscreen</button>
-<button onclick='window.container.requestFullscreen({keyboardLock: "browser"})'>Fullscreen with keyboardLock</button>
-<button onclick="document.exitFullscreen()">Exit fullscreen</button><br>
+<button id="fullscreenKeyboardLock" onclick='window.container.requestFullscreen({keyboardLock: "browser"})'>Fullscreen with keyboardLock</button>
+<button onclick='document.exitFullscreen()'>Exit fullscreen</button><br>
+<button id="keyboardLockAll" onclick='navigator.keyboard.lock()'>navigator.keyboard.lock()</button>
+<button id="keyboardLockEscape" onclick='navigator.keyboard.lock(["Escape"])'>navigator.keyboard.lock("Escape")</button>
+<button id="keyboardUnlock" onclick='navigator.keyboard.unlock()'>navigator.keyboard.unlock()</button><br>
 <input type="checkbox">Prevent default all keydown<br><br>
 <div id="output"></div>
 </div>
 <script>
+const hasNavigatorKeyboard = !!('keyboard' in navigator);
+document.getElementById('fullscreenKeyboardLock').disabled = hasNavigatorKeyboard;
+document.getElementById('keyboardLockAll').disabled = !hasNavigatorKeyboard;
+document.getElementById('keyboardLockEscape').disabled = !hasNavigatorKeyboard;
+document.getElementById('keyboardUnlock').disabled = !hasNavigatorKeyboard;
+
 function log(msg) {
   document.getElementById("output").innerHTML += `${msg}<br>`;
 }
 
-let checkbox = document.querySelector("input");
+const checkbox = document.querySelector("input");
 document.addEventListener("keydown", (e) => {
   log(`received keydown event: keyCode=${e.keyCode}`);
   if (checkbox.checked) {

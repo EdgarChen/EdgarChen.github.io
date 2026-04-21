@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fullscreen + browser stop tests</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    #output { white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; }
+
+    :fullscreen {
+      background: white !important;
+    }
+  </style>
+</head>
+<body>
+<div id="container">
+Iframe loads https://httpbin.org/delay/5 which delay response for 5 sec.<br>
+<iframe src="https://httpbin.org/delay/5"></iframe><br>
+<button onclick='window.container.requestFullscreen({keyboardLock: "none"})'>Fullscreen</button>
+<button onclick='window.container.requestFullscreen({keyboardLock: "browser"})'>Fullscreen with keyboardLock</button>
+<button onclick="document.exitFullscreen()">Exit fullscreen</button><br>
+<input type="checkbox">Prevent default all keydown<br><br>
+<div id="output"></div>
+</div>
+<script>
+function log(msg) {
+  document.getElementById("output").innerHTML += `${msg}<br>`;
+}
+
+let checkbox = document.querySelector("input");
+document.addEventListener("keydown", (e) => {
+  log(`received keydown event: keyCode=${e.keyCode}`);
+  if (checkbox.checked) {
+    log(`preventDefault() is called on keydown event for keyCode(${e.keyCode})`);
+    e.preventDefault();
+  }
+});
+
+document.querySelector("iframe").addEventListener("load", (e) => {
+  log("received iframe onload event");
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>input type=color eyedropper test</title>
+<style>
+  :root { font-family: system-ui, sans-serif; font-size: 14px; }
+  body { margin: 0; padding: 12px; background: #fafafa; color: #222; }
+  h2 { font-size: 15px; margin: 12px 0 6px; }
+  fieldset { margin: 0 0 10px; border: 1px solid #ccc; border-radius: 6px; }
+  legend { font-weight: 600; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0; }
+  .inputs { display: grid; grid-template-columns: max-content max-content 1fr; gap: 6px 12px; align-items: center; }
+  .inputs code { color: #555; }
+  #swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 6px; }
+  .swatch { height: 60px; border-radius: 4px; display: flex; align-items: end; justify-content: center;
+            font-size: 10px; color: #fff; text-shadow: 0 0 2px #000; padding-bottom: 2px; }
+  .checker { background-image: conic-gradient(#ccc 25%, #fff 0 50%, #ccc 0 75%, #fff 0);
+             background-size: 16px 16px; }
+  .big { height: 120px; border-radius: 4px; margin-top: 6px; }
+  #log { height: 260px; overflow: auto; background: #111; color: #ddd; font: 12px ui-monospace, monospace;
+         padding: 6px; margin: 0; white-space: pre-wrap; }
+  .log-change { color: #7fd17f; }
+  .log-input { color: #8ab4f8; }
+  .log-cancel { color: #f28b82; }
+  .log-error { color: #ff6b6b; font-weight: bold; }
+  .log-info { color: #aaa; }
+  .preview { display: inline-block; width: 1em; height: 1em; border: 1px solid #888; vertical-align: middle; }
+  #fs-area:fullscreen { background: #fff; padding: 20px; overflow: auto; }
+  #countdown { font-weight: 600; min-width: 4em; }
+</style>
+</head>
+<body>
+
+<fieldset>
+  <legend>Inputs</legend>
+  <div class="inputs">
+    <label><input type="radio" name="target" value="eyedropper" checked> target</label>
+    <input type="color" id="eyedropper" eyedropper value="#3366cc">
+    <code>&lt;input type=color eyedropper&gt;</code>
+
+    <label><input type="radio" name="target" value="normal"> target</label>
+    <input type="color" id="normal" value="#3366cc">
+    <code>&lt;input type=color&gt; (control)</code>
+  </div>
+  <div class="row" style="margin-top:6px">
+    <span id="support"></span>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>Attributes (applied to both inputs)</legend>
+  <div class="row">
+    <label><input type="checkbox" id="opt-eyedropper" checked> eyedropper (on first input)</label>
+    <label><input type="checkbox" id="opt-alpha"> alpha</label>
+    <label><input type="checkbox" id="opt-p3"> colorspace=display-p3</label>
+    <span id="attr-state" class="log-info"></span>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>showPicker()</legend>
+  <div class="row">
+    <button id="show-now">showPicker() now</button>
+    <button id="show-delay">showPicker() after</button>
+    <input type="number" id="delay" value="2000" min="0" step="100" style="width:6em"> ms
+    <span id="countdown"></span>
+    <button id="show-cancel-timer">Cancel timer</button>
+  </div>
+  <div class="row log-info">
+    Note: showPicker() needs transient user activation, which expires after
+    dom.user_activation.transient.timeout (5s by default).
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>Fullscreen</legend>
+  <div class="row">
+    <button id="fs-page">Fullscreen whole page</button>
+    <button id="fs-area-btn">Fullscreen color area only</button>
+    <button id="fs-exit">Exit fullscreen</button>
+  </div>
+</fieldset>
+
+<div id="fs-area">
+  <h2>Colors to pick</h2>
+  <div class="row" style="margin-bottom:6px">
+    In-area inputs (usable in element fullscreen):
+    <input type="color" id="eyedropper-fs" eyedropper value="#ff8800"> eyedropper
+    <input type="color" id="normal-fs" value="#ff8800"> normal
+    <button id="show-now-fs">showPicker() eyedropper</button>
+    <button id="show-delay-fs">showPicker() eyedropper after delay</button>
+  </div>
+  <div id="swatches"></div>
+  <div class="big" style="background: linear-gradient(to right, red, orange, yellow, lime, cyan, blue, magenta, red);"></div>
+  <div class="big" style="background: linear-gradient(to right, #000, #fff);"></div>
+  <div class="big checker" style="position:relative">
+    <div style="position:absolute; inset:0; border-radius:4px; background: linear-gradient(to right, rgb(255 0 0 / 0), rgb(255 0 0 / 1));"></div>
+  </div>
+  <div class="row" style="margin-top:6px">
+    <canvas id="noise" width="240" height="120" style="border-radius:4px"></canvas>
+    <div style="font-size: 40px; font-weight: 800; color: rgb(0 128 255)">Text</div>
+    <div style="width: 1px; height: 60px; background: #f0f"></div>
+    <div style="width: 3px; height: 3px; background: #0f0"></div>
+  </div>
+</div>
+
+<h2>Log <button id="clear-log">Clear</button></h2>
+<pre id="log"></pre>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const logEl = $("log");
+const allInputs = ["eyedropper", "normal", "eyedropper-fs", "normal-fs"].map($);
+const eyedropperInputs = [$("eyedropper"), $("eyedropper-fs")];
+
+function ts() {
+  const d = new Date();
+  return d.toTimeString().slice(0, 8) + "." + String(d.getMilliseconds()).padStart(3, "0");
+}
+
+function log(kind, msg, color) {
+  const line = document.createElement("div");
+  line.className = "log-" + kind;
+  line.textContent = `[${ts()}] ${kind.padEnd(6)} ${msg} `;
+  if (color) {
+    const p = document.createElement("span");
+    p.className = "preview";
+    p.style.background = color;
+    line.append(p);
+  }
+  logEl.append(line);
+  logEl.scrollTop = logEl.scrollHeight;
+  console.log(line.textContent);
+}
+
+function describe(input) {
+  const attrs = [];
+  if (input.hasAttribute("eyedropper")) attrs.push("eyedropper");
+  if (input.hasAttribute("alpha")) attrs.push("alpha");
+  if (input.hasAttribute("colorspace")) attrs.push(`colorspace=${input.getAttribute("colorspace")}`);
+  return `#${input.id}${attrs.length ? " [" + attrs.join(" ") + "]" : ""}`;
+}
+
+for (const input of allInputs) {
+  input.addEventListener("input", () =>
+    log("input", `${describe(input)} value=${input.value}`, input.value));
+  input.addEventListener("change", () =>
+    log("change", `${describe(input)} picked=${input.value}`, input.value));
+  input.addEventListener("cancel", () =>
+    log("cancel", `${describe(input)} value=${input.value}`));
+  input.addEventListener("click", () => log("info", `click on ${describe(input)}`));
+}
+
+const supported = "eyeDropper" in HTMLInputElement.prototype;
+$("support").textContent =
+  `eyeDropper IDL attribute: ${supported ? "supported" : "NOT supported (check dom.input.color_eyedropper.enabled)"}` +
+  ` | alpha: ${"alpha" in HTMLInputElement.prototype ? "yes" : "no"}` +
+  ` | colorSpace: ${"colorSpace" in HTMLInputElement.prototype ? "yes" : "no"}`;
+$("support").className = supported ? "log-info" : "log-error";
+
+function applyAttributes() {
+  const alpha = $("opt-alpha").checked;
+  const p3 = $("opt-p3").checked;
+  for (const input of allInputs) {
+    input.toggleAttribute("alpha", alpha);
+    if (p3) {
+      input.setAttribute("colorspace", "display-p3");
+    } else {
+      input.removeAttribute("colorspace");
+    }
+  }
+  for (const input of eyedropperInputs) {
+    input.toggleAttribute("eyedropper", $("opt-eyedropper").checked);
+  }
+  $("attr-state").textContent = allInputs.map(i => `${describe(i)} value=${i.value}`).join(" | ");
+  log("info", `attributes updated: alpha=${alpha} colorspace=${p3 ? "display-p3" : "limited-srgb"} eyedropper=${$("opt-eyedropper").checked}`);
+}
+for (const id of ["opt-eyedropper", "opt-alpha", "opt-p3"]) {
+  $(id).addEventListener("change", applyAttributes);
+}
+
+function currentTarget() {
+  return $(document.querySelector("input[name=target]:checked").value);
+}
+
+function callShowPicker(input) {
+  log("info", `showPicker() on ${describe(input)} (userActivation.isActive=${navigator.userActivation?.isActive})`);
+  try {
+    input.showPicker();
+  } catch (e) {
+    log("error", `showPicker() threw ${e.name}: ${e.message}`);
+  }
+}
+
+let timer = null;
+let countdownTimer = null;
+function cancelTimer() {
+  clearTimeout(timer);
+  clearInterval(countdownTimer);
+  timer = countdownTimer = null;
+  $("countdown").textContent = "";
+}
+
+function delayedShowPicker(input) {
+  cancelTimer();
+  const delay = Math.max(0, Number($("delay").value) || 0);
+  const end = performance.now() + delay;
+  log("info", `scheduling showPicker() on ${describe(input)} in ${delay}ms`);
+  countdownTimer = setInterval(() => {
+    $("countdown").textContent = `${Math.max(0, (end - performance.now()) / 1000).toFixed(1)}s`;
+  }, 100);
+  timer = setTimeout(() => {
+    cancelTimer();
+    callShowPicker(input);
+  }, delay);
+}
+
+$("show-now").addEventListener("click", () => callShowPicker(currentTarget()));
+$("show-delay").addEventListener("click", () => delayedShowPicker(currentTarget()));
+$("show-cancel-timer").addEventListener("click", () => {
+  cancelTimer();
+  log("info", "timer cancelled");
+});
+$("show-now-fs").addEventListener("click", () => callShowPicker($("eyedropper-fs")));
+$("show-delay-fs").addEventListener("click", () => delayedShowPicker($("eyedropper-fs")));
+
+async function enterFullscreen(el) {
+  try {
+    await el.requestFullscreen();
+  } catch (e) {
+    log("error", `requestFullscreen() failed ${e.name}: ${e.message}`);
+  }
+}
+$("fs-page").addEventListener("click", () => enterFullscreen(document.documentElement));
+$("fs-area-btn").addEventListener("click", () => enterFullscreen($("fs-area")));
+$("fs-exit").addEventListener("click", () => {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  }
+});
+document.addEventListener("fullscreenchange", () => {
+  const el = document.fullscreenElement;
+  log("info", `fullscreenchange: ${el ? "entered (" + (el.id || el.localName) + ")" : "exited"}`);
+});
+document.addEventListener("fullscreenerror", () => log("error", "fullscreenerror"));
+
+$("clear-log").addEventListener("click", () => (logEl.textContent = ""));
+
+const swatchColors = [
+  "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#00ffff", "#ff00ff",
+  "#000000", "#ffffff", "#808080", "#123456", "#abcdef", "#fedcba",
+  "#ff8800", "#663399", "#2e8b57", "#c0ffee",
+  "color(display-p3 1 0 0)", "color(display-p3 0 1 0)", "color(display-p3 0 0 1)",
+  "oklch(70% 0.3 145)",
+];
+const alphaColors = ["rgb(255 0 0 / 0.5)", "rgb(0 0 255 / 0.25)", "rgb(0 128 0 / 0.75)", "rgb(0 0 0 / 0.1)"];
+
+const swatches = $("swatches");
+for (const c of swatchColors) {
+  const s = document.createElement("div");
+  s.className = "swatch";
+  s.style.background = c;
+  s.textContent = c;
+  s.title = c;
+  swatches.append(s);
+}
+for (const c of alphaColors) {
+  const wrap = document.createElement("div");
+  wrap.className = "swatch checker";
+  wrap.style.position = "relative";
+  const inner = document.createElement("div");
+  inner.style.cssText = `position:absolute; inset:0; border-radius:4px; background:${c}`;
+  const label = document.createElement("span");
+  label.style.position = "relative";
+  label.textContent = c;
+  wrap.append(inner, label);
+  wrap.title = c;
+  swatches.append(wrap);
+}
+
+const ctx = $("noise").getContext("2d");
+for (let y = 0; y < 120; y += 4) {
+  for (let x = 0; x < 240; x += 4) {
+    ctx.fillStyle = `hsl(${(x * 1.5 + y) % 360} 80% ${30 + ((x * y) % 40)}%)`;
+    ctx.fillRect(x, y, 4, 4);
+  }
+}
+
+applyAttributes();
+</script>
+</body>
+</html>

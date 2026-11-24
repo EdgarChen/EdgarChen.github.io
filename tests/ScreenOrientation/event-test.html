@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Screen orientation test</title>
+    <style>
+      body {
+        margin: 1rem auto;
+        padding-inline: 1rem;
+        max-inline-size: 44rem;
+        font: 1rem/1.5 system-ui, sans-serif;
+        color: CanvasText;
+        background: Canvas;
+        color-scheme: light dark;
+      }
+      button {
+        font: inherit;
+        min-block-size: 2.75rem;
+        margin-block: 0.2rem;
+      }
+      pre {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Screen orientation test</h1>
+    <p>Enter fullscreen, then choose a lock. Keep the device still while reading the log.</p>
+    <button id="fullscreen">Enter fullscreen</button>
+    <button id="opposite" disabled>Lock opposite direction</button>
+    <button id="current" disabled>Lock current direction</button>
+    <button id="unlock" disabled>Unlock</button>
+    <pre id="log" role="log" aria-label="Event log"></pre>
+    <script>
+      const orientation = screen.orientation;
+      const fullscreen = document.getElementById("fullscreen");
+      const opposite = document.getElementById("opposite");
+      const current = document.getElementById("current");
+      const unlock = document.getElementById("unlock");
+      const log = document.getElementById("log");
+      const start = performance.now();
+      const supported = typeof orientation?.lock === "function";
+      let pending = false;
+      let nextRun = 0;
+      let lastRun = null;
+
+      function write(message) {
+        const time = Math.round(performance.now() - start);
+        const state = orientation
+          ? ` (${orientation.type}, ${orientation.angle}°)`
+          : "";
+        log.append(`[${time} ms] ${message}${state}\n`);
+      }
+
+      function updateButtons() {
+        const isFullscreen = Boolean(document.fullscreenElement);
+        fullscreen.textContent = isFullscreen ? "Exit fullscreen" : "Enter fullscreen";
+        opposite.disabled = current.disabled = !supported || !isFullscreen || pending;
+        unlock.disabled = typeof orientation?.unlock !== "function" || !isFullscreen;
+      }
+
+      async function runLock(useOpposite) {
+        const isPortrait = orientation.type.startsWith("portrait");
+        const target = isPortrait !== useOpposite ? "portrait" : "landscape";
+        const run = ++nextRun;
+        lastRun = run;
+        pending = true;
+        updateButtons();
+        write(`#${run} lock("${target}") called`);
+
+        const timer = setTimeout(() => {
+          write(`#${run} Promise still pending after 5 seconds`);
+        }, 5000);
+        try {
+          await orientation.lock(target);
+          write(`#${run} Promise fulfilled`);
+        } catch (error) {
+          write(`#${run} Promise rejected with ${error.name}: ${error.message}`);
+        } finally {
+          clearTimeout(timer);
+          pending = false;
+          updateButtons();
+        }
+      }
+
+      orientation?.addEventListener("change", () => {
+        const runLabel = lastRun === null ? "" : ` (last lock #${lastRun})`;
+        write(`change listener ran${runLabel}`);
+      });
+      document.addEventListener("fullscreenchange", () => {
+        updateButtons();
+        write(document.fullscreenElement ? "Entered fullscreen" : "Exited fullscreen");
+      });
+      fullscreen.addEventListener("click", async () => {
+        try {
+          if (document.fullscreenElement) {
+            await document.exitFullscreen();
+          } else {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          write(`Fullscreen failed with ${error.name}: ${error.message}`);
+        }
+      });
+      opposite.addEventListener("click", () => runLock(true));
+      current.addEventListener("click", () => runLock(false));
+      unlock.addEventListener("click", () => {
+        write("unlock() called");
+        try {
+          orientation.unlock();
+        } catch (error) {
+          write(`Unlock failed with ${error.name}: ${error.message}`);
+        }
+      });
+      updateButtons();
+      write(supported ? "Ready" : "screen.orientation.lock() is unavailable");
+    </script>
+  </body>
+</html>
